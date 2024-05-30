@@ -412,7 +412,7 @@ Gizmo {
  addUserKnob {1 tk_after_render l "after render"}
  addUserKnob {41 renderProgress l "render progress" T Write1.renderProgress}
 
- knobChanged "import nuke\nif hasattr(nuke, \"_shotgun_write_node_handler\"):\n    nuke._shotgun_write_node_handler.on_knob_changed_gizmo_callback()"
+ knobChanged "if nuke.thisKnob().name() not in ['xpos', 'ypos']:\n  import nuke\n  RenderChecks_WriteTank.checkSetsWT()\n  if hasattr(nuke, \"_shotgun_write_node_handler\"):\n    nuke._shotgun_write_node_handler.on_knob_changed_gizmo_callback()"
  onCreate "import nuke\nif hasattr(nuke, \"_shotgun_write_node_handler\"):\n    nuke._shotgun_write_node_handler.on_node_created_gizmo_callback()"
 }
  Input {
@@ -422,11 +422,14 @@ Gizmo {
   ypos -74
  }
  Write {
-  file  "\[python __import__('nuke')._shotgun_write_node_handler.on_compute_path_gizmo_callback() if hasattr(__import__('nuke'), '_shotgun_write_node_handler') else nuke.thisParent().knob('cached_path').value()]"
-  proxy "\[python __import__('nuke')._shotgun_write_node_handler.on_compute_proxy_path_gizmo_callback() if hasattr(__import__('nuke'), '_shotgun_write_node_handler') else nuke.thisParent().knob('tk_cached_proxy_path').value()]"
-  beforeRender "import nuke\nif hasattr(nuke, \"_shotgun_write_node_handler\"):\n    nuke._shotgun_write_node_handler.on_before_render_gizmo_callback()"
-  afterRender "import nuke\nif hasattr(nuke, \"_shotgun_write_node_handler\"):\n    nuke._shotgun_write_node_handler.on_after_render_gizmo_callback()"
+  file  "\[regsub -all [python os.getenv('MOUNT')] [python __import__('nuke')._shotgun_write_node_handler.on_compute_path_gizmo_callback() if hasattr(__import__('nuke'), '_shotgun_write_node_handler') else nuke.thisParent().knob('cached_path').value()] \[string range [value preferences.localCachePath] 0 end-1 ]]"
+  proxy "\[regsub -all [python os.getenv('MOUNT')] [python __import__('nuke')._shotgun_write_node_handler.on_compute_proxy_path_gizmo_callback() if hasattr(__import__('nuke'), '_shotgun_write_node_handler') else nuke.thisParent().knob('tk_cached_proxy_path').value()] \[string range [value preferences.localCachePath] 0 end-1 ]]"
+  beforeRender "import nuke\nimport RenderChecks\nRenderChecks.RenderSets()\nif hasattr(nuke, \"_shotgun_write_node_handler\"):\n    nuke._shotgun_write_node_handler.on_before_render_gizmo_callback()\ncopy_rendered_files.cacheAndCopy().createFolders()"
+  afterFrameRender "copy_rendered_files.cacheAndCopy().copyFiles()"
+  afterRender "import nuke\nRenderVersionsLimit.DeleteOldVersions()\nif hasattr(nuke, \"_shotgun_write_node_handler\"):\n    nuke._shotgun_write_node_handler.on_after_render_gizmo_callback()"
+
   name Write1
+  create_directories true
   xpos 195
   ypos -34
  }

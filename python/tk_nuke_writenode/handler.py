@@ -2177,7 +2177,7 @@ class TankWriteNodeHandler(object):
 
         if script_path:
             # convert to os-style slashes:
-            script_path = script_path.replace(os.path.sep, "/")
+            script_path = script_path.replace("/", os.path.sep)
 
         return script_path
 
@@ -2202,7 +2202,7 @@ class TankWriteNodeHandler(object):
             last_known_path = knob.value()
             if last_known_path:
                 # correct slashes for compare:
-                last_known_path = last_known_path.replace(os.path.sep, "/")
+                last_known_path = last_known_path.replace("/", os.path.sep)
 
             if last_known_path != save_file_path:
                 # we're saving to a new file so reset the render path:

@@ -347,3 +347,29 @@ class NukeWriteNode(tank.platform.Application):
                     "Convert menu options were disabled as "
                     "promoted knobs were detected in the app settings."
                 )
+        ###DPS ADDED  GEO AND CAM SHOTGUN WRITES
+        try:
+            cam_fn = lambda :nuke.createNode('ShotgunWriteCam.gizmo')
+            self.engine.register_command(
+                "ShotgunWriteCAM [Shotgun]",
+                cam_fn,
+                dict(
+                    type="node",
+                    icon=write_node_icon,
+                    context=context,
+                )
+            )
+            geo_fn = lambda :nuke.createNode('ShotgunWriteGeo.gizmo')
+            self.engine.register_command(
+                "ShotgunWriteGEO [Shotgun]",
+                geo_fn,
+                dict(
+                    type="node",
+                    icon=write_node_icon,
+                    context=context,
+                )
+            )
+        except:
+            print("There was a problem and shotgunwriteGeo nodes have bot been added to Nodes menu")
+
+
