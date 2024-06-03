@@ -369,15 +369,6 @@ class NukeWriteNode(tank.platform.Application):
                     context=context,
                 )
             )
-            ####DPS Write Shortcuts
-            # # CUSTOM SHORTCUTS
-            write_node_item = nuke.menu('Nodes').findItem("Image/Write")
-            write_node_item.setShortcut("")
-
-            nuke.menu('Nodes').findItem("Flow Production Tracking").findItem("Render 16bits [Flow Production Tracking]").setShortcut('w')
-            nuke.menu('Nodes').findItem("Flow Production Tracking").findItem("PRECOMP [Flow Production Tracking]").setShortcut('Alt+w')
-            nuke.menu('Nodes').findItem("Flow Production Tracking").findItem("TECH_PRECOMP [Flow Production Tracking]").setShortcut(
-                'Alt+j')
         except:
             print("There was a problem and shotgunwriteGeo nodes have bot been added to Nodes menu")
 
