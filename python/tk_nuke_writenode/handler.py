@@ -97,6 +97,7 @@ class TankWriteNodeHandler(object):
             self._profile_names.append(name)
             self._profiles[name] = profile
 
+
     def populate_script_template(self):
         """
         Sources the current context's work file template from the parent app.
