@@ -1828,8 +1828,9 @@ class TankWriteNodeHandler(object):
                 # of the proxy dimensions.
                 return self.__gather_render_settings(node, False)
 
-            # width & height are set to the proxy dimensions:
-            width, height = self.__calculate_proxy_dimensions(node)
+            # # width & height are set to the proxy dimensions:
+            # width, height = self.__calculate_proxy_dimensions(node)
+            width, height = node.width(), node.height()
         else:
             # width & height are set to the node's dimensions:
             width, height = node.width(), node.height()
