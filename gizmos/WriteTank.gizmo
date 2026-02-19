@@ -422,10 +422,10 @@ Gizmo {
   ypos -74
  }
  Write {
-  file  "\[regsub -all [python os.getenv('MOUNT')] [python __import__('nuke')._shotgun_write_node_handler.on_compute_path_gizmo_callback() if hasattr(__import__('nuke'), '_shotgun_write_node_handler') else nuke.thisParent().knob('cached_path').value()] \[string range [value preferences.localCachePath] 0 end-1 ]]"
+  file "\[set _path \[python __import__('nuke')._shotgun_write_node_handler.on_compute_path_gizmo_callback() if hasattr(__import__('nuke'), '_shotgun_write_node_handler') else nuke.thisParent().knob('cached_path').value()] ; if \{\[python nuke.thisNode().knob('file_type').value()] ne \"mov\" && \[python nuke.thisNode().knob('file_type').value()] ne \"mxf\"\} \{ regsub -all \[python os.getenv('MOUNT')] \$_path \[python nuke.value('preferences.localCachePath').rstrip('/')] \} else \{ set _path \}]"
   proxy "\[regsub -all [python os.getenv('MOUNT')] [python __import__('nuke')._shotgun_write_node_handler.on_compute_proxy_path_gizmo_callback() if hasattr(__import__('nuke'), '_shotgun_write_node_handler') else nuke.thisParent().knob('tk_cached_proxy_path').value()] \[string range [value preferences.localCachePath] 0 1 ]/RENDER]"
   beforeRender "import nuke\nimport RenderChecks\nRenderChecks.RenderSets()\nif hasattr(nuke, \"_shotgun_write_node_handler\"):\n    nuke._shotgun_write_node_handler.on_before_render_gizmo_callback()\nif nuke.root().knob('proxy').value()==False:\n    copy_rendered_files.cacheAndCopy().createFolders()\nelse:\n    if nuke.root().knob(\"proxy\").value()==True:\n        try:\n            nuke.thisNode().knob(\"cached_compression\").setValue(nuke.thisNode().knob(\"compression\").value())\n            nuke.thisNode().knob(\"compression\").setValue(0)\n        except:\n            pass"
-  afterFrameRender "if nuke.root().knob('proxy').value()==False:\n    copy_rendered_files.cacheAndCopy().copyFiles()"
+  afterFrameRender "if nuke.root().knob('proxy').value()==False and any(a in nuke.thisNode()\['file'].evaluate()  for a in \['.mp4', '.mov', '.mxf']) == False :\n    copy_rendered_files.cacheAndCopy().copyFiles()"
   afterRender "import nuke\nRenderVersionsLimit.DeleteOldVersions()\nif hasattr(nuke, \"_shotgun_write_node_handler\"):\n    nuke._shotgun_write_node_handler.on_after_render_gizmo_callback()\nif nuke.root().knob(\"proxy\").value()==True:\n    try:\n        nuke.thisNode().knob(\"compression\").setValue(nuke.thisNode().knob(\"cached_compression\").value())\n    except:\n        pass"
 
   name Write1
