@@ -108,11 +108,14 @@ class TankWriteNodeHandler(object):
         Returns a list of tank write nodes
         """
         if nuke.exists("root"):
-            return nuke.allNodes(
-                group=nuke.root(),
-                filter=TankWriteNodeHandler.SG_WRITE_NODE_CLASS,
-                recurseGroups=True,
-            )
+            return [
+                n for n in nuke.allNodes(
+                    group=nuke.root(),
+                    filter="Group",
+                    recurseGroups=True,
+                )
+                if n.knob("tk_is_write_node")
+            ]
         else:
             return []
 
@@ -237,7 +240,12 @@ class TankWriteNodeHandler(object):
             return
 
         # new node please!
-        node = nuke.createNode(TankWriteNodeHandler.SG_WRITE_NODE_CLASS)
+        group_path = os.path.join(self._app.disk_location, "groups", "WriteTank.nk")
+        nuke.nodePaste(group_path)
+        node = nuke.selectedNode()
+
+
+
 
         # rename to our new default name:
         existing_node_names = [n.name() for n in nuke.allNodes()]
@@ -370,7 +378,7 @@ class TankWriteNodeHandler(object):
         # user create callback that gets executed whenever a Shotgun Write Node
         # is created by the user
         nuke.addOnUserCreate(
-            self.__on_user_create, nodeClass=TankWriteNodeHandler.SG_WRITE_NODE_CLASS
+            self.__on_user_create, nodeClass="Group"
         )
 
         # set up all existing nodes:
@@ -384,7 +392,7 @@ class TankWriteNodeHandler(object):
         nuke.removeOnScriptLoad(self.process_placeholder_nodes, nodeClass="Root")
         nuke.removeOnScriptSave(self.__on_script_save)
         nuke.removeOnUserCreate(
-            self.__on_user_create, nodeClass=TankWriteNodeHandler.SG_WRITE_NODE_CLASS
+            self.__on_user_create, "Group"
         )
 
     def convert_sg_to_nuke_write_nodes(self, selnode=False):
@@ -572,8 +580,10 @@ class TankWriteNodeHandler(object):
             node_name = wn.name()
             node_pos = (wn.xpos(), wn.ypos())
 
-            # create new Flow Production Tracking Write node:
-            new_sg_wn = nuke.createNode(TankWriteNodeHandler.SG_WRITE_NODE_CLASS)
+            # Same fix as create_new_node():
+            nukescripts.clear_selection_recursive()
+            nuke.nodePaste(group_path)
+            new_sg_wn = nuke.selectedNode()
             new_sg_wn.setSelected(False)
 
             # copy across file & proxy knobs as well as all cached templates:
@@ -2016,7 +2026,7 @@ class TankWriteNodeHandler(object):
         """
         # check that this node is actually a Gizmo.  It might not be if
         # it was created/loaded when the Gizmo wasn't available!
-        if not isinstance(node, nuke.Gizmo):
+        if not node.knob("tk_is_write_node"):
             return
 
         self._app.log_debug("Setting up new node...")
@@ -2266,8 +2276,7 @@ class TankWriteNodeHandler(object):
 
         # check that this node is actually a Gizmo.  It might not be if
         # it was created/loaded when the Gizmo wasn't available!
-        if not isinstance(node, nuke.Gizmo):
-            # it's not so we can't do anything!
+        if not node.knob("tk_is_write_node"):
             return
 
         # setup the new node:

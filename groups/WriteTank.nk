@@ -76,7 +76,6 @@ Group {
     +STARTLINE
     +INVISIBLE
  }
- knob tk_is_write_node true
  addUserKnob {
     1 profile_name
     l "Profile Name"
