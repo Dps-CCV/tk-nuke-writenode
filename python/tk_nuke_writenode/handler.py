@@ -1132,6 +1132,9 @@ class TankWriteNodeHandler(object):
             profile["proxy_publish_template"]
         )
         file_type = profile["file_type"]
+        if '$' in file_type:
+            file_type = os.environ[file_type[1:]]
+
         file_settings = profile["settings"]
         tile_color = profile["tile_color"]
         promote_write_knobs = profile.get("promote_write_knobs", [])
@@ -1372,7 +1375,9 @@ class TankWriteNodeHandler(object):
                     % (setting_name, file_type)
                 )
                 continue
-
+            self._app.log_debug(setting_value)
+            if isinstance(setting_value, str) and '$' in  setting_value:
+                setting_value = os.environ[setting_value[1:]]
             knob.setValue(setting_value)
             if knob.value() != setting_value:
                 self._app.log_error(
