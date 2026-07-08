@@ -513,7 +513,7 @@ class TankWriteNodeHandler(object):
 
             # add python for deadline use
             new_wn.knob('beforeRender').setValue(
-                "import nuke\nserverpath = nuke.thisNode().knob('file').value()\ncachePath = nuke.toNode('preferences')['localCachePath'].value()[:-1]\nlocalpath = serverpath.replace('P:', cachePath)\nnuke.thisNode().knob('file').setValue(localpath)\ncopy_rendered_files.cacheAndCopy().createFolders()")
+                "import nuke\nimport os\nserverpath = nuke.thisNode().knob('file').value()\ncachePath = nuke.toNode('preferences')['localCachePath'].value()[:-1]\nlocalpath = serverpath.replace(os.environ['MOUNT'], cachePath)\nnuke.thisNode().knob('file').setValue(localpath)\ncopy_rendered_files.cacheAndCopy().createFolders()")
             new_wn.knob('afterRender').setValue("import nuke\nRenderVersionsLimit.DeleteOldVersions()")
 
     def convert_nuke_to_sg_write_nodes(sel, selnode=False):
